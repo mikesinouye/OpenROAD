@@ -93,4 +93,7 @@ build --remote_upload_local_results=false
 # Without this, bazelisk build ... builds the bazel-orfs tests
 build --build_tag_filters=-orfs
 
+# Enables version stamping in the binary
+build --workspace_status_command=bazel/workspace_status.sh
+
 try-import %workspace%/user.bazelrc

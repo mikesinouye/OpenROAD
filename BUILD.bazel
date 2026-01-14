@@ -220,15 +220,19 @@ cc_library(
     ],
 )
 
+# Only reads from stable-status.txt so dependencies will only be cache
+# invalidated when the commit changes.
 genrule(
     name = "OpenRoadVersion",
     srcs = [],
     outs = ["include/ord/Version.hh"],
-    cmd = """echo -e '
-#define OPENROAD_VERSION "HDL-HEAD"
-#define OPENROAD_GIT_SHA1 "HEAD"
-' > \"$@\"
+    cmd = """
+    export SHA1=$$(grep "^STABLE_GIT_COMMIT" bazel-out/stable-status.txt | cut -d ' ' -f 2)
+    export VERSION=$$(grep "^STABLE_GIT_VERSION" bazel-out/stable-status.txt | cut -d ' ' -f 2)
+    echo -e "#define OPENROAD_GIT_SHA1 \\"$$SHA1\\"
+#define OPENROAD_VERSION \\"$$VERSION\\"" > \"$@\"
     """,
+    stamp = True,
 )
 
 tcl_encode(
