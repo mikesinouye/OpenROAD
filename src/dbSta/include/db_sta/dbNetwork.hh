@@ -340,6 +340,8 @@ class dbNetwork : public ConcreteNetwork
   PortDirection* direction(const Pin* pin) const override;
   VertexId vertexId(const Pin* pin) const override;
   void setVertexId(Pin* pin, VertexId id) override;
+  std::string getAttribute(const Pin* pin,
+                           std::string_view key) const override;
   // Find the connected odb::dbModITerm in the parent module of the input pin.
   odb::dbModITerm* findInputModITermInParent(const Pin* input_pin) const;
 

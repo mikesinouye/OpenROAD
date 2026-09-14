@@ -466,6 +466,13 @@ void MBFF::ModifyPinConnections(const std::vector<Flop>& flops,
     // *before* disconnecting, then disconnect/reconnect and store the
     // original pin name as a property on the tray instance.
     const std::string orig_inst_name(insts_[flops[i].idx]->getName());
+    odb::dbStringProperty* inst_src_prop
+        = odb::dbStringProperty::find(insts_[flops[i].idx], "src");
+    if (inst_src_prop
+        && !odb::dbStringProperty::find(tray_inst[tray_idx], "src")) {
+      odb::dbStringProperty::create(
+          tray_inst[tray_idx], "src", inst_src_prop->getValue().c_str());
+    }
     for (dbITerm* iterm : insts_[flops[i].idx]->getITerms()) {
       // Classify while the iterm is still connected.
       const bool is_d = network_->isDPin(iterm);
@@ -545,6 +552,19 @@ void MBFF::ModifyPinConnections(const std::vector<Flop>& flops,
           prop->setValue(val.c_str());
         } else {
           odb::dbStringProperty::create(tray_iterm, kOrigNameProp, val.c_str());
+        }
+
+        odb::dbStringProperty* src_prop
+            = odb::dbStringProperty::find(insts_[flops[i].idx], "src");
+        if (src_prop) {
+          odb::dbStringProperty* tray_src_prop
+              = odb::dbStringProperty::find(tray_iterm, "src");
+          if (tray_src_prop) {
+            tray_src_prop->setValue(src_prop->getValue().c_str());
+          } else {
+            odb::dbStringProperty::create(
+                tray_iterm, "src", src_prop->getValue().c_str());
+          }
         }
       }
     }

@@ -2061,6 +2061,23 @@ std::string dbNetwork::getAttribute(const Instance* inst,
   return "";
 }
 
+std::string dbNetwork::getAttribute(const Pin* pin,
+                                    std::string_view key) const
+{
+  if (pin == nullptr) {
+    return "";
+  }
+  odb::dbObject* obj = staToDb(pin);
+  if (obj) {
+    odb::dbStringProperty* property
+        = odb::dbStringProperty::find(obj, std::string(key).c_str());
+    if (property) {
+      return property->getValue();
+    }
+  }
+  return "";
+}
+
 void dbNetwork::setAttribute(Instance* instance,
                              std::string_view key,
                              std::string_view value)
