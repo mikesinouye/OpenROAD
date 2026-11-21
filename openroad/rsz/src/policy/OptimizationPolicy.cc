@@ -333,15 +333,16 @@ void OptimizationPolicy::prewarmTargetLibertyCaches(
     return;
   }
 
-  std::unordered_set<sta::LibertyCell*> cells_to_prewarm;
+  std::unordered_set<sta::LibertyCell*> seen_cells;
+  std::vector<sta::LibertyCell*> cells_to_prewarm;
   for (const Target& target : targets) {
     sta::Instance* inst = target.inst(resizer_);
     if (inst == nullptr) {
       continue;
     }
     sta::LibertyCell* current_cell = resizer_.network()->libertyCell(inst);
-    if (current_cell != nullptr) {
-      cells_to_prewarm.insert(current_cell);
+    if (current_cell != nullptr && seen_cells.insert(current_cell).second) {
+      cells_to_prewarm.push_back(current_cell);
     }
   }
 
